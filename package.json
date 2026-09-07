@@ -1,0 +1,19 @@
+{
+  "name": "reveal-overflow",
+  "version": "1.0.0",
+  "description": "Detect overflowing content in reveal.js presentations",
+  "type": "module",
+  "bin": {
+    "reveal-overflow": "./bin/reveal-overflow.js"
+  },
+  "scripts": {
+    "start": "node ./bin/reveal-overflow.js",
+    "check": "node ./bin/reveal-overflow.js"
+  },
+  "dependencies": {
+    "playwright": "^1.55.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
