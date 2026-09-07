@@ -45,26 +45,16 @@ Examples:
 function parseArgs(argv) {
   const options = {
     input: null,
-
     threshold: 1,
-
     width: 1280,
-
     height: 720,
-
     timeout: 30_000,
-
     wait: 100,
-
     fragments: true,
-
     screenshots: null,
-
     json: false,
-
     quiet: false,
-
-    fail: false
+    fail: false,
   };
 
   const valueOptions = new Set([
@@ -73,20 +63,13 @@ function parseArgs(argv) {
     "--height",
     "--timeout",
     "--wait",
-    "--screenshots"
+    "--screenshots",
   ]);
 
-  for (
-    let i = 0;
-    i < argv.length;
-    i++
-  ) {
+  for (let i = 0; i < argv.length; i++) {
     const arg = argv[i];
 
-    if (
-      arg === "--help" ||
-      arg === "-h"
-    ) {
+    if (arg === "--help" || arg === "-h") {
       usage();
       process.exit(0);
     }
@@ -96,9 +79,7 @@ function parseArgs(argv) {
       continue;
     }
 
-    if (
-      arg === "--no-fragments"
-    ) {
+    if (arg === "--no-fragments") {
       options.fragments = false;
       continue;
     }
@@ -108,10 +89,7 @@ function parseArgs(argv) {
       continue;
     }
 
-    if (
-      arg === "--quiet" ||
-      arg === "-q"
-    ) {
+    if (arg === "--quiet" || arg === "-q") {
       options.quiet = true;
       continue;
     }
@@ -122,69 +100,40 @@ function parseArgs(argv) {
     }
 
     if (valueOptions.has(arg)) {
-      const value =
-        argv[++i];
-
+      const value = argv[++i];
       if (value === undefined) {
-        throw new Error(
-          `${arg} requires a value`
-        );
+        throw new Error(`${arg} requires a value`);
       }
 
-      if (
-        arg === "--screenshots"
-      ) {
-        options.screenshots =
-          value;
-
+      if (arg === "--screenshots") {
+        options.screenshots = value;
         continue;
       }
 
-      const number =
-        Number(value);
+      const number = Number(value);
 
-      if (
-        !Number.isFinite(number) ||
-        number < 0
-      ) {
-        throw new Error(
-          `Invalid value for ${arg}: ${value}`
-        );
+      if (!Number.isFinite(number) || number < 0) {
+        throw new Error(`Invalid value for ${arg}: ${value}`);
       }
 
       const key = {
-        "--threshold":
-          "threshold",
-
-        "--width":
-          "width",
-
-        "--height":
-          "height",
-
-        "--timeout":
-          "timeout",
-
-        "--wait":
-          "wait"
+        "--threshold": "threshold",
+        "--width": "width",
+        "--height": "height",
+        "--timeout": "timeout",
+        "--wait": "wait",
       }[arg];
 
-      options[key] =
-        number;
-
+      options[key] = number;
       continue;
     }
 
     if (arg.startsWith("-")) {
-      throw new Error(
-        `Unknown option: ${arg}`
-      );
+      throw new Error(`Unknown option: ${arg}`);
     }
 
     if (options.input !== null) {
-      throw new Error(
-        `Unexpected argument: ${arg}`
-      );
+      throw new Error(`Unexpected argument: ${arg}`);
     }
 
     options.input = arg;
@@ -202,137 +151,75 @@ function formatPx(value) {
   return `${Number(value).toFixed(1)}px`;
 }
 
-function printHuman(
-  result,
-  options
-) {
+function printHuman(result, options) {
   if (!options.quiet) {
     console.log("");
-    console.log(
-      "Reveal.js overflow check"
-    );
+    console.log("Reveal.js overflow check");
 
     console.log(
       `Browser viewport: ` +
-      `${result.browser.innerWidth} × ` +
-      `${result.browser.innerHeight}px`
+        `${result.browser.innerWidth} × ` +
+        `${result.browser.innerHeight}px`,
     );
 
     console.log(
       `Reveal slide:     ` +
-      `${result.reveal.slideWidth} × ` +
-      `${result.reveal.slideHeight}px`
+        `${result.reveal.slideWidth} × ` +
+        `${result.reveal.slideHeight}px`,
     );
 
     console.log(
-      `Reveal scale:     ` +
-      `${Number(result.reveal.scale).toFixed(4)}`
+      `Reveal scale:     ` + `${Number(result.reveal.scale).toFixed(4)}`,
     );
 
-    console.log(
-      `Threshold:        ` +
-      `${options.threshold}px`
-    );
+    console.log(`Threshold:        ` + `${options.threshold}px`);
 
     console.log("");
   }
 
-  for (
-    const slide of result.slides
-  ) {
+  for (const slide of result.slides) {
     if (!slide.overflow) {
       if (!options.quiet) {
-        console.log(
-          `✓ Slide ${slide.label}`
-        );
+        console.log(`✓ Slide ${slide.label}`);
       }
-
       continue;
     }
 
     const directions = [];
 
-    if (
-      slide.leftOverflow >
-      options.threshold
-    ) {
-      directions.push(
-        `left ${formatPx(
-          slide.leftOverflow
-        )}`
-      );
+    if (slide.leftOverflow > options.threshold) {
+      directions.push(`left ${formatPx(slide.leftOverflow)}`);
     }
 
-    if (
-      slide.rightOverflow >
-      options.threshold
-    ) {
-      directions.push(
-        `right ${formatPx(
-          slide.rightOverflow
-        )}`
-      );
+    if (slide.rightOverflow > options.threshold) {
+      directions.push(`right ${formatPx(slide.rightOverflow)}`);
     }
 
-    if (
-      slide.topOverflow >
-      options.threshold
-    ) {
-      directions.push(
-        `top ${formatPx(
-          slide.topOverflow
-        )}`
-      );
+    if (slide.topOverflow > options.threshold) {
+      directions.push(`top ${formatPx(slide.topOverflow)}`);
     }
 
-    if (
-      slide.bottomOverflow >
-      options.threshold
-    ) {
-      directions.push(
-        `bottom ${formatPx(
-          slide.bottomOverflow
-        )}`
-      );
+    if (slide.bottomOverflow > options.threshold) {
+      directions.push(`bottom ${formatPx(slide.bottomOverflow)}`);
     }
 
-    console.log(
-      `✗ Slide ${slide.label} — ` +
-      directions.join(", ")
-    );
+    console.log(`✗ Slide ${slide.label} — ` + directions.join(", "));
 
-    for (
-      const element of slide.elements.slice(
-        0,
-        10
-      )
-    ) {
-      const amount =
-        Math.max(
-          element.horizontalOverflow,
-          element.verticalOverflow
-        );
-
-      console.log(
-        `    ${element.selector}` +
-        ` — ${formatPx(amount)}`
+    for (const element of slide.elements.slice(0, 10)) {
+      const amount = Math.max(
+        element.horizontalOverflow,
+        element.verticalOverflow,
       );
+
+      console.log(`    ${element.selector}` + ` — ${formatPx(amount)}`);
 
       if (element.text) {
-        console.log(
-          `      "${element.text}"`
-        );
+        console.log(`      "${element.text}"`);
       }
     }
 
-    if (
-      slide.elements.length > 10
-    ) {
-      console.log(
-        `    … and ` +
-        `${slide.elements.length - 10}` +
-        ` more`
-      );
+    if (slide.elements.length > 10) {
+      console.log(`    … and ` + `${slide.elements.length - 10}` + ` more`);
     }
   }
 
@@ -342,17 +229,11 @@ function printHuman(
     if (result.failed) {
       console.log(
         `Found ${result.overflowCount} ` +
-        `overflowing slide` +
-        `${
-          result.overflowCount === 1
-            ? ""
-            : "s"
-        }.`
+          `overflowing slide` +
+          `${result.overflowCount === 1 ? "" : "s"}.`,
       );
     } else {
-      console.log(
-        "✓ No overflowing slides."
-      );
+      console.log("✓ No overflowing slides.");
     }
   }
 }
@@ -361,64 +242,30 @@ async function main() {
   let options;
 
   try {
-    options =
-      parseArgs(
-        process.argv.slice(2)
-      );
+    options = parseArgs(process.argv.slice(2));
   } catch (error) {
-    console.error(
-      `reveal-overflow: ${error.message}`
-    );
-
+    console.error(`reveal-overflow: ${error.message}`);
     process.exit(2);
   }
 
   try {
-    const result =
-      await checkPresentation(
-        options
-      );
+    const result = await checkPresentation(options);
 
     if (options.json) {
-      console.log(
-        JSON.stringify(
-          result,
-          null,
-          2
-        )
-      );
+      console.log(JSON.stringify(result, null, 2));
     } else {
-      printHuman(
-        result,
-        options
-      );
+      printHuman(result, options);
     }
 
-    if (
-      options.fail &&
-      result.failed
-    ) {
+    if (options.fail && result.failed) {
       process.exit(1);
     }
-
     process.exit(0);
   } catch (error) {
     if (options.json) {
-      console.error(
-        JSON.stringify(
-          {
-            error:
-              error.message
-          },
-          null,
-          2
-        )
-      );
+      console.error(JSON.stringify({ error: error.message }, null, 2));
     } else {
-      console.error(
-        `reveal-overflow: ` +
-        `${error.message}`
-      );
+      console.error(`reveal-overflow: ` + `${error.message}`);
     }
 
     process.exit(2);
